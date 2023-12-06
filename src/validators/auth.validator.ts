@@ -1,7 +1,7 @@
 const { check, validationResult } = require('express-validator');
 import { Response, Request, NextFunction } from 'express';
 
-const signUpValidationRules = [
+const authValidationRules = [
   check('email')
     .trim()
     .not()
@@ -16,7 +16,7 @@ const signUpValidationRules = [
     .withMessage('Password is required!')
 ];
 
-const signUpValidationErrors = (req: Request, res: Response, next: NextFunction) => {
+const authValidationErrors = (req: Request, res: Response, next: NextFunction) => {
   const result = validationResult(req).array();
   if (result && result.length === 0) 
   {
@@ -29,6 +29,6 @@ const signUpValidationErrors = (req: Request, res: Response, next: NextFunction)
 }
 
 export {
-    signUpValidationErrors,
-    signUpValidationRules
+    authValidationErrors,
+    authValidationRules
 }

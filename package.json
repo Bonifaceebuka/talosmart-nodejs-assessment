@@ -1,11 +1,11 @@
 {
-	"name": "anyjob-node-typescript-role",
+	"name": "talosmart-nodejs-assessment",
 	"version": "1.0.0",
-	"description": "This is a NodeJS backend service.",
+	"description": "This is a NodeJS backend service for Switch Hive.",
 	"license": "MIT",
-	"repository": "https://github.com/Bonifaceebuka/summitech-node-developer-test.git",
+	"repository": "https://github.com/Bonifaceebuka/talosmart-nodejs-assessment.git",
 	"author": "Agbo Boniface Ebuka",
-	"main": "index.js",
+	"main": "server.js",
 	"scripts": {
 		"dev": "ts-node-dev --respawn src/server.ts",
 		"build": "tsc",

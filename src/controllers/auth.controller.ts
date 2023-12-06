@@ -5,12 +5,14 @@ import User from "../models/user.model";
 import { jwtConfig as config } from "../config";
 import { isValidUser } from "../functions/utils";
 
+///Signup logic
 export const signUp = async (request: Request, response: Response): Promise<Response> => {
   const { email, password } = request.body;
   if(await isValidUser(email) === true){
       return response.status(404).json({ message: 'User email already exists!' });
   }
 
+  /// Password encryption logic
   const passwordSalt = await bcrypt.genSalt(15)
   const hashedPassword = await bcrypt.hash(password, passwordSalt);
 
