@@ -9,7 +9,11 @@ import { isValidUser } from "../functions/utils";
 export const signUp = async (request: Request, response: Response): Promise<Response> => {
   const { email, password } = request.body;
   if(await isValidUser(email) === true){
-      return response.status(404).json({ message: 'User email already exists!' });
+      return response.status(404).json({ 
+        status_code: 400,
+        message: 'User email already exists!',
+        data: null
+       });
   }
 
   /// Password encryption logic
@@ -23,14 +27,17 @@ export const signUp = async (request: Request, response: Response): Promise<Resp
   try {
     const user = await User.create(data);
     return response.status(201).json({
+      status_code: 201,
       message: 'Account Created', 
       data: user
   });
   } catch (error) {
-    return response.status(400).json({ error: 'Unable to create your account!' });
+    return response.status(400).json({ 
+      status_code: 400,
+      message: 'Unable to create your account!',
+      data: null
+     });
   }
- 
-  
 }
 
 ///Login Logic
@@ -45,25 +52,34 @@ export const signIn = async (request: Request, response: Response): Promise<Resp
       if(await bcrypt.compare(password, user.dataValues.password)){
         const token = loginWebToken(user);
         return response.status(200).json({
-          success: true,
-          token: `Bearer ${token}`,
+          status_code: 200,
+          data: `Bearer ${token}`,
           message: "You are now logged in.",
         });
       }
       else{
         return response
           .status(400)
-          .json({ error: "Invalid login details!", success: false });
+          .json({ 
+            status_code: 400,
+            message: "Invalid login details!", 
+            data: null });
       } 
       }
       return response
             .status(400)
-            .json({ error: "Invalid login details!", success: false });
+            .json({ 
+              status_code: 400,
+              message: "Invalid login details!", 
+              data: null });
     
   } catch (error) {
     return response
             .status(500)
-            .json({ error: "Internal server error!", success: false });
+            .json({ 
+              status_code: 500,
+              message: "Internal server error!", 
+              data: null });
   }
 };
 

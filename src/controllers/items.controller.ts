@@ -1,116 +1,81 @@
 import { Response } from "express";
-import User from "../models/user.model";
-import { isValidUser } from "../functions/utils";
 import { IUserAuthRequest } from '../interfaces/user.interface';
 import item from "../models/item.model";
-const url = require('url');
 
-    export const viewInvitation = async (request: IUserAuthRequest, response: Response): Promise<Response> => {
-        const { invitation_id } = request.params;
-        const { id } = request.authUser;
-    
-        if(await isValidUser(id) === false){
-              return response.status(404).json({ message: 'User does not exist!' });
-          }
-    
-          try {
-            const invitations = await SavingsGroupInvitation.findOne(
-             {
-                    include: [
-                    {
-                        model: SavingsGroup,
-                        attributes: ['id','group_name','group_description'],
-                        required: true,
-                        include: [{
-                                model: User,
-                                attributes: ['email','id'],
-                                required: true
-                            }],
-                    }
-                ],
-                where: { 
-                    receiver_id: id,
-                    id: invitation_id
-                },
-                attributes: ['id']
-             }
-            );
+export const listItems = async (request: IUserAuthRequest, response: Response): Promise<Response> => {
 
-            if (!invitations){
-                return response.status(400).json({ message: 'Invalid invitation link!' });
-            }
-            return response.status(200).json({ 
-                data: invitations,
-                actions: {
-                    accept_invitation:'http://' +request.headers.host+'/api/savings/act_on_invitation/'+invitations.dataValues.id+'?action=accept',
-                    decline_invitation:'http://' +request.headers.host+'/api/savings/act_on_invitation/'+invitations.dataValues.id+'?action=decline',
-                }
-             });
-            
-          } catch (error) {
-            return response.status(404).json({ message: 'Internal server error!' });
-          }
+  try {
 
-        }
+    const items = await item.findAll({
+      limit: 12,
+      attributes: ['id', 'logo', 'title'],
+      order: [
+        ['createdAt', 'DESC']
+      ]
+    });
+    return response.status(200).json({
+      status_code: 200,
+      data: items
+    });
 
-        
-        export const acceptOrDecline = async (request: IUserAuthRequest, response: Response): Promise<any> => {
-            const { invitation_id } = request.params;
-            const { id } = request.authUser;
-            const queryStrings = url.parse(request.url, true).query;
-            const action = queryStrings.action
-    
-            if(await isValidUser(id) === false){
-                  return response.status(404).json({ message: 'User does not exist!' });
-              }
-        
-              try {
-                const invitations = await SavingsGroupInvitation.findOne(
-                 {
-                    where: { 
-                        receiver_id: id,
-                        id: invitation_id,
-                        status: 0
-                    },
-                    attributes: ['id']
-                 }
-                );
-    
-                if (!invitations){
-                    return response.status(400).json({ message: 'Invalid invitation link!' });
-                }
-                
-                if(action && action ==='accept'){
-                    try {
-                        await SavingsGroupInvitation.update({
-                            status: 1,
-                          },{
-                            where: {
-                                id: invitations.dataValues.id
-                            }
-                        });
+  } catch (error) {
+    return response.status(400).json({
+      status_code: 400,
+      message: 'Internal server error!',
+      data: null
+     });
+  }
 
-                        return response.status(200).json({ message: 'Invitation accepted successfully' });
-                    } catch (error) {
-                        return response.status(404).json({ message: 'Internal server error, Unable to decline this invation!' });
-                    }
-                }
-                else if(action ==='decline'){
-                    try {
-                        await SavingsGroupInvitation.destroy({
-                            where: {
-                                id: invitations.dataValues.id
-                            }
-                        });
+}
 
-                        return response.status(200).json({ message: 'Invitation declined successfully' });
-                    } catch (error) {
-                        return response.status(404).json({ message: 'Internal server error, Unable to decline this invation!' });
-                    }
-                }
-                
-              } catch (error) {
-                return response.status(404).json({ message: 'Internal server error!' });
-              }
-    
-            }
+
+export const showDetails = async (request: IUserAuthRequest, response: Response): Promise<any> => {
+  const { item_id } = request.params;
+
+  if (typeof item_id !== "number") {
+    return response.status(400).json({ status_code: 400, message: 'Invlid item ID!', data: null });
+  }
+
+  try {
+    const itemDetails = await item.findOne(
+      {
+        where: {
+          id: item_id
+        },
+        attributes: ['id',
+          'title',
+          'description',
+          'slogan',
+          'online_status',
+          'price_start',
+          'price_end',
+          'delivery_type',
+          'terms_and_condition',
+          'how_to_redeem',
+          'network_fees',
+          'logo']
+      }
+    );
+
+    if (!itemDetails) {
+      return response.status(404).json({ 
+        status_code: 400,
+        message: 'Item not found!',
+        data: null
+       });
+    }
+
+    return response.status(200).json({
+      status_code: 200,
+      data: itemDetails,
+    });
+
+  } catch (error) {
+    return response.status(400).json({ 
+      status_code: 400,
+      message: 'Internal server error!',
+      data: null
+     });
+  }
+
+}
