@@ -1,7 +1,7 @@
 import { Response } from "express";
 import User from "../models/user.model";
 import SavingsGroupInvitation from "../models/savingsGroupInvitation.model";
-import { isValidUser, isValidGroup } from "../functions/utils";
+import { isValidUser } from "../functions/utils";
 import { IUserAuthRequest } from '../interfaces/user.interface';
 import SavingsGroup from "../models/savingsGroup.model";
 const url = require('url');
@@ -18,10 +18,6 @@ export const sendInvitation = async (request: IUserAuthRequest, response: Respon
 
     if(await isValidUser(invitee_email) === false){
         return response.status(404).json({ message: 'Invitee is unregistered!' });
-    }
-
-      if(await isValidGroup(group_id) !== true){
-        return response.status(404).json({ message: 'Group does not exist!' });
     }
 
     try {

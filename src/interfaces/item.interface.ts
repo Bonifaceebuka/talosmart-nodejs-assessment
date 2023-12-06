@@ -1,4 +1,4 @@
-export interface IcreateSavingsGroupInvitation {
+export interface IcreateItem {
     id?: number;
     status?: number;
     sender_id: number;
@@ -6,7 +6,7 @@ export interface IcreateSavingsGroupInvitation {
     group_id: number;
 }
 
-export interface IviewSavingsGroupInvitation {
+export interface IviewItem {
     id: number;
     sender_id: number;
     receiver_id: number;

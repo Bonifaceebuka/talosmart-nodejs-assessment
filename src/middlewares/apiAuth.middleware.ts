@@ -7,6 +7,8 @@ import { IUserAuthRequest } from '../interfaces/user.interface';
 type JwtPayload = {
   id: string
 }
+
+/// Middleware logic that checks if a user is authenticated or not
 const auth = async (request: IUserAuthRequest, response: Response, next: NextFunction): Promise<Response | void> => {
   const { authorization } = request.headers;
   if (!authorization) {
