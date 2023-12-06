@@ -1,87 +1,9 @@
 import { Response } from "express";
 import User from "../models/user.model";
-import SavingsGroupInvitation from "../models/savingsGroupInvitation.model";
 import { isValidUser } from "../functions/utils";
 import { IUserAuthRequest } from '../interfaces/user.interface';
-import SavingsGroup from "../models/savingsGroup.model";
+import item from "../models/item.model";
 const url = require('url');
-
-export const sendInvitation = async (request: IUserAuthRequest, response: Response): Promise<Response> => {
-    const { group_id } = request.params;
-    const { invitee_email } = request.body;
-    const { id } = request.authUser;
-    var receiver_id: any = null;
-
-    if(await isValidUser(id) === false){
-          return response.status(404).json({ message: 'User does not exist!' });
-      }
-
-    if(await isValidUser(invitee_email) === false){
-        return response.status(404).json({ message: 'Invitee is unregistered!' });
-    }
-
-    try {
-        const user = await User.findOne(
-          {
-            where: { email: invitee_email}
-          }
-        );
-        if (user){
-            receiver_id = user.dataValues.id;
-        }
-        
-      } catch (error) {
-        return response.status(404).json({ message: 'Invitee does not exist!' });
-      }
-
-      try {
-        const invitations = await SavingsGroupInvitation.count(
-          {
-            where: { sender_id: id}
-          }
-        );
-        if (invitations >= 4){
-            return response.status(400).json({ message: 'You are not allowed to send more than 4 invitations!' });
-        }
-        
-      } catch (error) {
-        return response.status(404).json({ message: 'Invitee does not exist!' });
-      }
-
-      try {
-        const invitationSent = await SavingsGroupInvitation.findOne(
-            {
-              where: { 
-                sender_id: id,
-                group_id: group_id,
-                receiver_id: receiver_id,
-            }
-            }
-          );
-          if (invitationSent){
-            return response.status(400).json({ message: 'Invitee has already been invited!' });
-          }
-    } catch (error) {
-        return response.status(400).json({ message: 'Unable to find the invitation already sent!' });
-    }
-
-      const data = {
-        sender_id: parseInt(id),
-        receiver_id: parseInt(receiver_id),
-        status: 1,
-        group_id: parseInt(group_id)
-    }
-
-      try {
-        const savingsGroup = await SavingsGroupInvitation.create(data);
-        return response.status(201).json({
-          message: 'Invitation sent successfully', 
-          view_invation_link: 'http://' +request.headers.host+'/api/savings/view_invitation/'+savingsGroup.dataValues.id 
-      });
-      } catch (error) {
-        return response.status(400).json({ error: 'Unable to send this invite!' });
-      } 
-    }
 
     export const viewInvitation = async (request: IUserAuthRequest, response: Response): Promise<Response> => {
         const { invitation_id } = request.params;
