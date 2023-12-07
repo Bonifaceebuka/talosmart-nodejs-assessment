@@ -2,6 +2,7 @@ import { Response } from "express";
 import { IUserAuthRequest } from '../interfaces/user.interface';
 import item from "../models/item.model";
 
+/// This function returns the list of 12 registered items
 export const listItems = async (request: IUserAuthRequest, response: Response): Promise<Response> => {
 
   try {
@@ -28,12 +29,16 @@ export const listItems = async (request: IUserAuthRequest, response: Response): 
 
 }
 
+/// This function returns the details of selected ID of an item
 
 export const showDetails = async (request: IUserAuthRequest, response: Response): Promise<any> => {
   const { item_id } = request.params;
 
-  if (typeof item_id !== "number") {
-    return response.status(400).json({ status_code: 400, message: 'Invlid item ID!', data: null });
+  if (+item_id !== parseInt(item_id)) {
+    return response.status(400).json({ 
+      status_code: 400,
+      message: 'Invlid item ID!', 
+      data: null });
   }
 
   try {
